@@ -8,3 +8,9 @@ node_modules
 
 # mac files
 *.DS_Store
+
+# sample music files
+music
+
+# livereload
+miru-connect.js
