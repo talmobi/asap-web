@@ -1,0 +1,25 @@
+{
+  "name": "asap-web",
+  "version": "0.0.0",
+  "description": "TODO",
+  "main": "asap-web.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "asap-web"
+  ],
+  "author": "talmobi <talmo.christian@gmail.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/talmobi/asap-web"
+  },
+  "bugs": {
+    "url": "https://github.com/talmobi/asap-web/issues",
+    "email": "talmo.christian@gmail.com"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
