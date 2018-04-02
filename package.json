@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "miru -t '*.html' -t 'src/**' -t 'vendor/**'",
     "wrap": "webwrap -v -x createAsapPlayer vendor/XAudioJS/XAudioServer.js vendor/XAudioJS/resampler.js vendor/XAudioJS/swfobject.js src/asap/asap.js src/asap/asap_player.js -o dist/wrapper.js",
+    "wrap:min": "uglifyjs dist/wrapper.js -cmo dist/wrapper.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -25,6 +26,7 @@
   "dependencies": {},
   "devDependencies": {
     "miru": "~0.10.8",
+    "uglify-js": "~3.3.18",
     "webwrap": "~0.2.2"
   }
 }
