@@ -12,7 +12,9 @@ function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underR
     XAudioJSCallbackAPIEventNotificationCallback = (typeof heartbeatCallback == "function") ? heartbeatCallback : null;
     XAudioJSCallbackAPIEventNotificationCallback2 = (typeof postheartbeatCallback == "function") ? postheartbeatCallback : null;
 	XAudioJSVolume = (volume >= 0 && volume <= 1) ? volume : 1;
-	this.failureCallback = (typeof failureCallback == "function") ? failureCallback : function () { throw(new Error("XAudioJS has encountered a fatal error.")); };
+	this.failureCallback = (typeof failureCallback == "function") ? failureCallback : function ( err ) {
+	  throw(new Error("XAudioJS has encountered a fatal error: " + err ));
+	};
 	this.initializeAudio();
 }
 XAudioServer.prototype.MOZWriteAudioNoCallback = function (buffer, upTo) {
@@ -58,7 +60,7 @@ XAudioServer.prototype.writeAudio = function (buffer, upTo) {
 			this.callbackBasedExecuteCallback();
 			break;
 		default:
-			this.failureCallback();
+      this.failureCallback( 'Error: writeAudio, audioType: ' + this.audioType );
 	}
 }
 /*Pass your samples into here if you don't want automatic callback calling:
@@ -80,7 +82,7 @@ XAudioServer.prototype.writeAudioNoCallback = function (buffer, upTo) {
 			this.callbackBasedWriteAudioNoCallback(buffer, upTo);
 			break;
 		default:
-			this.failureCallback();
+			this.failureCallback( 'Error: writeAudioNoCallback, audioType: ' + this.audioType );
 	}
 }
 //Developer can use this to see how many samples to write (example: minimum buffer allotment minus remaining samples left returned from this function to make sure maximum buffering is done...)
@@ -94,7 +96,7 @@ XAudioServer.prototype.remainingBuffer = function () {
 		case 1:
 			return (Math.floor((XAudioJSResampledSamplesLeft() * XAudioJSResampleControl.ratioWeight) / XAudioJSChannelsAllocated) * XAudioJSChannelsAllocated) + XAudioJSAudioBufferSize;
 		default:
-			this.failureCallback();
+			this.failureCallback( 'Error: remainingBuffer, audioType: ' + this.audioType );
 			return null;
 	}
 }
@@ -126,28 +128,34 @@ XAudioServer.prototype.executeCallback = function () {
 			this.callbackBasedExecuteCallback();
 			break;
 		default:
-			this.failureCallback();
+			this.failureCallback( 'Error: executeCallback, audioType: ' + this.audioType );
 	}
 }
 //DO NOT CALL THIS, the lib calls this internally!
 XAudioServer.prototype.initializeAudio = function () {
+  var errors = []
+  try {
+    this.initializeMozAudio();
+  } catch ( err ) {
+    errors.push( err )
     try {
-        this.initializeMozAudio();
+      this.initializeWebAudio();
+    } catch ( err ) {
+      errors.push( err )
+      try {
+        this.initializeFlashAudio();
+      } catch ( err ) {
+        errors.push( err )
+        this.audioType = -1;
+
+        var errMessage = 'Error: initializeAudio, audioType: ' + this.audioType
+        errMessage += errors.map( function ( err ) {
+          return '  ' + err.toString()
+        } ).join( '\n' )
+        this.failureCallback( errMessage )
+      }
     }
-    catch (error) {
-        try {
-            this.initializeWebAudio();
-        }
-        catch (error) {
-            try {
-                this.initializeFlashAudio();
-            }
-            catch (error) {
-                this.audioType = -1;
-                this.failureCallback();
-            }
-        }
-    }
+  }
 }
 XAudioServer.prototype.initializeMozAudio = function () {
     this.audioHandleMoz = new Audio();
@@ -164,49 +172,52 @@ XAudioServer.prototype.initializeMozAudio = function () {
     this.initializeResampler(XAudioJSMozAudioSampleRate);
 }
 XAudioServer.prototype.initializeWebAudio = function () {
-	if (!XAudioJSWebAudioLaunchedContext) {
-        try {
-            XAudioJSWebAudioContextHandle = new AudioContext();								//Create a system audio context.
-        }
-        catch (error) {
-            XAudioJSWebAudioContextHandle = new webkitAudioContext();							//Create a system audio context.
-        }
-        XAudioJSWebAudioLaunchedContext = true;
-    }
-    if (XAudioJSWebAudioAudioNode) {
-        XAudioJSWebAudioAudioNode.disconnect();
-        XAudioJSWebAudioAudioNode.onaudioprocess = null;
-        XAudioJSWebAudioAudioNode = null;
-    }
+  if (!XAudioJSWebAudioLaunchedContext) {
     try {
-        XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createScriptProcessor(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);	//Create the js event node.
+      XAudioJSWebAudioContextHandle = new AudioContext();								//Create a system audio context.
+    } catch (error) {
+      XAudioJSWebAudioContextHandle = new webkitAudioContext();							//Create a system audio context.
     }
-    catch (error) {
-        XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createJavaScriptNode(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);	//Create the js event node.
-    }
-    XAudioJSWebAudioAudioNode.onaudioprocess = XAudioJSWebAudioEvent;																			//Connect the audio processing event to a handling function so we can manipulate output
-    XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination);																//Send and chain the output of the audio manipulation to the system audio output.
-    this.resetCallbackAPIAudioBuffer(XAudioJSWebAudioContextHandle.sampleRate);
-    this.audioType = 1;
-    /*
+    XAudioJSWebAudioLaunchedContext = true;
+  }
+
+  if (XAudioJSWebAudioAudioNode) {
+    XAudioJSWebAudioAudioNode.disconnect();
+    XAudioJSWebAudioAudioNode.onaudioprocess = null;
+    XAudioJSWebAudioAudioNode = null;
+  }
+
+  try {
+    XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createScriptProcessor(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);	//Create the js event node.
+  } catch (error) {
+    XAudioJSWebAudioAudioNode = XAudioJSWebAudioContextHandle.createJavaScriptNode(XAudioJSSamplesPerCallback, 0, XAudioJSChannelsAllocated);	//Create the js event node.
+  }
+
+  XAudioJSWebAudioAudioNode.onaudioprocess = XAudioJSWebAudioEvent; //Connect the audio processing event to a handling function so we can manipulate output
+  XAudioJSWebAudioAudioNode.connect(XAudioJSWebAudioContextHandle.destination); //Send and chain the output of the audio manipulation to the system audio output.
+
+  this.resetCallbackAPIAudioBuffer(XAudioJSWebAudioContextHandle.sampleRate);
+
+  this.audioType = 1;
+  /*
      Firefox has a bug in its web audio implementation...
      The node may randomly stop playing on Mac OS X for no
      good reason. Keep a watchdog timer to restart the failed
      node if it glitches. Google Chrome never had this issue.
      */
-    XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
-    if (navigator.userAgent.indexOf('Gecko/') > -1) {
-        if (XAudioJSWebAudioWatchDogTimer) {
-            clearInterval(XAudioJSWebAudioWatchDogTimer);
-        }
-        var parentObj = this;
-        XAudioJSWebAudioWatchDogTimer = setInterval(function () {
-            var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
-            if (timeDiff > 500) {
-                parentObj.initializeWebAudio();
-            }
-        }, 500);
+  XAudioJSWebAudioWatchDogLast = (new Date()).getTime();
+  if (navigator.userAgent.indexOf('Gecko/') > -1) {
+    if (XAudioJSWebAudioWatchDogTimer) {
+      clearInterval(XAudioJSWebAudioWatchDogTimer);
     }
+    var parentObj = this;
+    XAudioJSWebAudioWatchDogTimer = setInterval(function () {
+      var timeDiff = (new Date()).getTime() - XAudioJSWebAudioWatchDogLast;
+      if (timeDiff > 500) {
+        parentObj.initializeWebAudio();
+      }
+    }, 500);
+  }
 }
 XAudioServer.prototype.initializeFlashAudio = function () {
 	var existingFlashload = document.getElementById("XAudioJS");
@@ -277,7 +288,7 @@ XAudioServer.prototype.changeVolume = function (newVolume) {
 				}
 				break;
 			default:
-				this.failureCallback();
+        this.failureCallback( 'Error: changeVolume, audioType: ' + this.audioType );
 		}
 	}
 }
@@ -297,9 +308,9 @@ XAudioServer.prototype.checkFlashInit = function () {
 }
 //Set up the resampling:
 XAudioServer.prototype.resetCallbackAPIAudioBuffer = function (APISampleRate) {
-	XAudioJSAudioBufferSize = XAudioJSResampleBufferEnd = XAudioJSResampleBufferStart = 0;
-    this.initializeResampler(APISampleRate);
-    XAudioJSResampledBuffer = this.getFloat32(XAudioJSResampleBufferSize);
+  XAudioJSAudioBufferSize = XAudioJSResampleBufferEnd = XAudioJSResampleBufferStart = 0;
+  this.initializeResampler(APISampleRate);
+  XAudioJSResampledBuffer = this.getFloat32(XAudioJSResampleBufferSize);
 }
 XAudioServer.prototype.initializeResampler = function (sampleRate) {
     XAudioJSAudioContextSampleBuffer = this.getFloat32(XAudioJSMaxBufferSize);
