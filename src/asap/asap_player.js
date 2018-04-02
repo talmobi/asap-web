@@ -287,7 +287,7 @@ function createAsapPlayer ( opts ) {
 }
 
 // attach to Cowbell
-if ( typeof Cowbell 'object' && typeof Cowbell.Player === 'object' ) {
+if ( typeof Cowbell === 'object' && typeof Cowbell.Player === 'object' ) {
   Cowbell.Player.ASAP = function(opts) {
     // return new Cowbell.Common.WebAudioPlayer(ASAPGenerator, opts);
     return createAsapPlayer( opts )
