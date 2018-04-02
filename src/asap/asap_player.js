@@ -244,6 +244,11 @@ function createAsapPlayer ( opts ) {
       }
 
       self.seek = function ( seconds ) {
+        seconds = Number( seconds )
+        if ( ! (seconds >= 0 ) ) {
+          seconds = 0
+        }
+
         var s = seconds
 
         if ( s > self.duration ) {
