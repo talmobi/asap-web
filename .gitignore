@@ -14,3 +14,7 @@ music
 
 # livereload
 miru-connect.js
+
+# build files
+dist/
+stage/
