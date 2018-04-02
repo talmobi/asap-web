@@ -3,6 +3,8 @@
 function ASAP()
 {
 	this.blocksPlayed = 0;
+	this._seekingTimeout = undefined;
+	this.seeking = false;
 	this.consol = 0;
 	this.covox = new Array(4);
 	this.cpu = new Cpu6502();
@@ -546,15 +548,56 @@ ASAP.prototype.seek = function(position) {
 	this.seekSample(ASAP.millisecondsToBlocks(position));
 }
 
-ASAP.prototype.seekSample = function(block) {
-	if (block < this.blocksPlayed)
-		this.playSong(this.currentSong, this.currentDuration);
-	while (this.blocksPlayed + this.pokeys.readySamplesEnd < block) {
-		this.blocksPlayed += this.pokeys.readySamplesEnd;
-		this.doFrame();
+ASAP.prototype.seekSample = function( block ) {
+	var self = this
+
+	// cancel previous seeking position
+	if ( self._seekingTimeout !== undefined ) clearTimeout( self._seekingTimeout )
+
+  // if seeking below current position, reset first
+	if ( block < self.blocksPlayed ) {
+		self.playSong( self.currentSong, self.currentDuration );
 	}
-	this.pokeys.readySamplesStart = block - this.blocksPlayed;
-	this.blocksPlayed = block;
+
+	var startTime = Date.now();
+
+  // seek forward a little bit at a time without blocking
+  // the main thread for too long at a time
+	function step () {
+		var counter = 0;
+		var limit = Math.max( self.pokeys.readySamplesEnd, 200 );
+
+		while ( self.blocksPlayed + self.pokeys.readySamplesEnd < block ) {
+			self.blocksPlayed += self.pokeys.readySamplesEnd;
+			self.doFrame();
+
+			counter += 1;
+			if ( counter > limit ) break; // don't block main UI thread for too long
+		}
+
+    // continue seeking if we aren't done yet, but give main thread some
+    // time to do work
+		if ( self.blocksPlayed + self.pokeys.readySamplesEnd < block ) {
+			self._seekingTimeout = setTimeout( step, 1 )
+		} else {
+			// done
+			self.pokeys.readySamplesStart = block - self.blocksPlayed;
+			self.blocksPlayed = block;
+
+			var now = Date.now();
+			var delta = ( now - startTime );
+
+			// remember to reset self._seekingTimeout
+			self.seeking = false;
+			self._seekingTimeout = undefined;
+			self.onseekingdone && self.onseekingdone( delta )
+		}
+	}
+
+	// start seeking
+	self.seeking = true;
+  self.onseeking && self.onseeking()
+	self._seekingTimeout = setTimeout( step, 1 )
 }
 
 function ASAP6502()
