@@ -25,6 +25,8 @@ function ASAP()
 	this.silenceCycles = 0;
 }
 
+ASAP.SAMPLE_RATE = 44100;
+
 ASAP.prototype.call6502 = function(addr) {
 	this.memory[53760] = 32;
 	this.memory[53761] = addr & 0xff;
@@ -211,13 +213,13 @@ ASAP.prototype.getPokeyChannelVolume = function(channel) {
 }
 
 ASAP.prototype.getPosition = function() {
-	return Math.floor(this.blocksPlayed * 10 / 441);
+	return Math.floor(this.blocksPlayed * 10 / ( ASAP.SAMPLE_RATE / 100 ) );
 }
 
 ASAP.prototype.getWavHeader = function(buffer, format, metadata) {
 	var use16bit = format != ASAPSampleFormat.U8 ? 1 : 0;
 	var blockSize = this.moduleInfo.channels << use16bit;
-	var bytesPerSecond = 44100 * blockSize;
+	var bytesPerSecond = ASAP.SAMPLE_RATE * blockSize;
 	var totalBlocks = ASAP.millisecondsToBlocks(this.currentDuration);
 	var nBytes = (totalBlocks - this.blocksPlayed) * blockSize;
 	ASAP.putLittleEndian(buffer, 8, 1163280727);
@@ -226,7 +228,7 @@ ASAP.prototype.getWavHeader = function(buffer, format, metadata) {
 	buffer[21] = 0;
 	buffer[22] = this.moduleInfo.channels;
 	buffer[23] = 0;
-	ASAP.putLittleEndians(buffer, 24, 44100, bytesPerSecond);
+	ASAP.putLittleEndians(buffer, 24, ASAP.SAMPLE_RATE, bytesPerSecond);
 	buffer[32] = blockSize;
 	buffer[33] = 0;
 	buffer[34] = 8 << use16bit;
@@ -326,7 +328,21 @@ ASAP.prototype.load = function(filename, module, moduleLen) {
 }
 
 ASAP.millisecondsToBlocks = function(milliseconds) {
-	return Math.floor(milliseconds * 441 / 10);
+	var blocks = (
+	  Math.floor(
+	    milliseconds * ( ASAP.SAMPLE_RATE / 100 ) / 10
+	  )
+  )
+	return blocks
+}
+
+ASAP.blocksToMilliseconds = function( blocks ) {
+  var milliseconds = (
+    Math.floor(
+      ( blocks / ASAP.SAMPLE_RATE ) * 1000
+    )
+  )
+	return milliseconds
 }
 
 ASAP.prototype.mutePokeyChannels = function(mask) {
@@ -542,7 +558,6 @@ ASAP.putWavMetadata = function(buffer, offset, fourCC, value) {
 	}
 	return offset;
 }
-ASAP.SAMPLE_RATE = 44100;
 
 ASAP.prototype.seek = function(position) {
 	this.seekSample(ASAP.millisecondsToBlocks(position));
