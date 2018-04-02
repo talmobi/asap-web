@@ -151,8 +151,7 @@ ASAP.prototype.generate = function(buffer, bufferLen, format) {
 }
 
 ASAP.prototype.generateAt = function(buffer, bufferOffset, bufferLen, format) {
-	if (this.silenceCycles > 0 && this.silenceCyclesCounter <= 0)
-		return 0;
+	if (this.silenceCycles > 0 && this.silenceCyclesCounter <= 0) return 0;
 	var blockShift = this.moduleInfo.channels - 1 + (format != ASAPSampleFormat.U8 ? 1 : 0);
 	var bufferBlocks = bufferLen >> blockShift;
 	if (this.currentDuration > 0) {
@@ -559,8 +558,8 @@ ASAP.putWavMetadata = function(buffer, offset, fourCC, value) {
 	return offset;
 }
 
-ASAP.prototype.seek = function(position) {
-	this.seekSample(ASAP.millisecondsToBlocks(position));
+ASAP.prototype.seek = function( position ) {
+	this.seekSample( ASAP.millisecondsToBlocks( position ) );
 }
 
 ASAP.prototype.seekSample = function( block ) {
