@@ -4,8 +4,11 @@
   "description": "TODO",
   "main": "asap-web.js",
   "scripts": {
-    "dev": "miru -t '*.html' -t 'src/**' -t 'vendor/**'",
-    "wrap": "webwrap -v -x createAsapPlayer vendor/XAudioJS/XAudioServer.js vendor/XAudioJS/resampler.js vendor/XAudioJS/swfobject.js src/asap/asap.js src/asap/asap_player.js -o dist/wrapper.js",
+    "build": "npm run build:src && npm run uglify",
+    "build:src": "browserify --bare -t [ babelify --presets [ env ] ] src/app.js -o dist/bundle.js 2>&1 | wooster",
+    "dev": "miru -t '*.html' -t 'src/**' -t 'vendor/**' -t 'dist/**'",
+    "wrap": "webwrap -v -f umd -n asap -x createAsapPlayer vendor/XAudioJS/XAudioServer.js vendor/XAudioJS/resampler.js vendor/XAudioJS/swfobject.js src/asap/asap.js src/asap/asap_player.js -o dist/wrapper.js",
+    "wrapl": "../webwrap/cli.js -v -f umd -n asap -x createAsapPlayer vendor/XAudioJS/XAudioServer.js vendor/XAudioJS/resampler.js vendor/XAudioJS/swfobject.js src/asap/asap.js src/asap/asap_player.js -o dist/wrapper.js",
     "wrap:min": "uglifyjs dist/wrapper.js -cmo dist/wrapper.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,8 +28,12 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "babel-core": "~6.26.0",
+    "babel-preset-env": "~1.6.1",
+    "babelify": "~8.0.0",
+    "browserify": "~16.1.1",
     "miru": "~0.10.8",
     "uglify-js": "~3.3.18",
-    "webwrap": "~0.2.3"
+    "webwrap": "~0.3.0"
   }
 }
