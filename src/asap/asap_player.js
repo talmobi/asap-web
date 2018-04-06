@@ -82,7 +82,7 @@ function createAsapPlayer ( opts ) {
       console.log( err )
     }
 
-    var audio = new XAudioServer(
+    player.xAudioServer = new XAudioServer(
       channels,
       sampleRate,
       bufLow,
@@ -104,7 +104,7 @@ function createAsapPlayer ( opts ) {
 
     player.heartbeat = function () {
       if ( !asap.seeking ) {
-        audio.executeCallback();
+        player.xAudioServer.executeCallback();
 
         if ( player.updateTime ) {
           player.updateTime()
@@ -147,10 +147,29 @@ function createAsapPlayer ( opts ) {
 
   player.close = function () {
     var audioElement = player.audioElement
+
     if ( audioElement ) {
       player.stop()
       audioElement.stop()
     }
+
+    // free resource
+    delete player.asap
+    delete player.info
+    delete player.audioElement
+
+    delete player.xAudioServer
+
+    delete player.heartbeatCallback
+    delete player.postheartbeatCallback
+
+    delete player.failureCallback
+
+    delete player.onloaded
+
+    delete player.heartbeat
+
+    delete player.underRunCallback
   }
 
   var api = {}
