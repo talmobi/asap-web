@@ -77,38 +77,41 @@ var swfobject = function() {
                     j.addEventListener("DOMContentLoaded", f, false)
                 }
                 if (M.ie && M.win) {
-                    j.attachEvent(x, function() {
+                    var listener = function () {
                         if (j.readyState == "complete") {
-                            j.detachEvent(x, arguments.callee);
+                            j.detachEvent(x, listener);
                             f()
                         }
-                    });
+                    }
+                    j.attachEvent(x, listener );
                     if (O == top) {
-                        (function() {
+                        var tick = function () {
                             if (J) {
                                 return
                             }
                             try {
                                 j.documentElement.doScroll("left")
                             } catch (X) {
-                                setTimeout(arguments.callee, 0);
+                                setTimeout(tick, 0);
                                 return
                             }
                             f()
-                        })()
+                        }
+                        tick()
                     }
                 }
                 if (M.wk) {
-                    (function() {
+                    var tick = function () {
                         if (J) {
                             return
                         }
                         if (!/loaded|complete/.test(j.readyState)) {
-                            setTimeout(arguments.callee, 0);
+                            setTimeout(tick, 0);
                             return
                         }
                         f()
-                    })()
+                    }
+                    tick()
                 }
                 s(f)
             }
@@ -178,7 +181,7 @@ var swfobject = function() {
         var Z = X.appendChild(aa);
         if (Z) {
             var Y = 0;
-            (function() {
+            var tick = function () {
                 if (typeof Z.GetVariable != D) {
                     var ab = Z.GetVariable("$version");
                     if (ab) {
@@ -188,14 +191,15 @@ var swfobject = function() {
                 } else {
                     if (Y < 10) {
                         Y++;
-                        setTimeout(arguments.callee, 10);
+                        setTimeout(tick, 10);
                         return
                     }
                 }
                 X.removeChild(aa);
                 Z = null;
                 H()
-            })()
+            }
+            tick()
         } else {
             H()
         }
@@ -322,13 +326,15 @@ var swfobject = function() {
                 Y.setAttribute("id", X);
                 ae.parentNode.insertBefore(Y, ae);
                 ae.style.display = "none";
-                (function() {
+
+                var tick = function () {
                     if (ae.readyState == 4) {
                         ae.parentNode.removeChild(ae)
                     } else {
-                        setTimeout(arguments.callee, 10)
+                        setTimeout(tick, 10)
                     }
-                })()
+                }
+                tick()
             }
             u(aa, ab, X)
         }
@@ -340,13 +346,15 @@ var swfobject = function() {
             Y.parentNode.insertBefore(X, Y);
             X.parentNode.replaceChild(g(Y), X);
             Y.style.display = "none";
-            (function() {
+
+            var tick = function () {
                 if (Y.readyState == 4) {
                     Y.parentNode.removeChild(Y)
                 } else {
-                    setTimeout(arguments.callee, 10)
+                    setTimeout(tick, 10)
                 }
-            })()
+            }
+            tick()
         } else {
             Y.parentNode.replaceChild(g(Y), Y)
         }
@@ -446,13 +454,15 @@ var swfobject = function() {
         if (X && X.nodeName == "OBJECT") {
             if (M.ie && M.win) {
                 X.style.display = "none";
-                (function() {
+
+                var tick = function () {
                     if (X.readyState == 4) {
                         b(Y)
                     } else {
-                        setTimeout(arguments.callee, 10)
+                        setTimeout( tick, 10)
                     }
-                })()
+                }
+                tick()
             } else {
                 X.parentNode.removeChild(X)
             }
