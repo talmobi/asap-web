@@ -4,9 +4,12 @@
 # asap-web
 An updated Atari music player for the web based on Piotr Fusik's [Another Slight Atari Player](http://asap.sourceforge.net)
 
-Now available as a UMD module! Install directly from `npm`!
+Now available as a UMD module! Install directly from `npm`! `npm install asap-web`
 
 ![](https://i.imgur.com/01DY6rX.png)
+
+## Demo
+https://talmobi.github.io/asap-web/
 
 ## Easy to use
 
