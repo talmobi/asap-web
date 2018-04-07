@@ -80,7 +80,10 @@ body {
   letter-spacing: 3px;
 }
 video {
+  position: fixed;
   pointer-events: none;
+  top: 0;
+  z-index: -20;
 }
 .app {
   width: 400px;
