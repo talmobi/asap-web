@@ -76,8 +76,15 @@ body {
   -o-transform: translate(-50%);
   -ms-transform: translate(-50%);
   transform: translate(-50%);
+  -webkit-transition: left 0.2s ease-in-out;
+  -moz-transition: left 0.2s ease-in-out;
+  -o-transition: left 0.2s ease-in-out;
+  -ms-transition: left 0.2s ease-in-out;
+  transition: left 0.2s ease-in-out;
   line-height: 1.6rem;
   letter-spacing: 3px;
+  padding: 0 1rem;
+  z-index: 20;
 }
 #bg-video {
   position: fixed !important;

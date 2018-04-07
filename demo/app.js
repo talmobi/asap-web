@@ -61,6 +61,15 @@ function App ()
     _progress.innerText =  timestamp
   } )
 
+  window.onscroll = function ( evt ) {
+    const scroll = document.documentElement.scrollTop
+    if ( scroll > 20 ) {
+      _progress.style.left = '10%'
+    } else {
+      _progress.style.left = ''
+    }
+  }
+
   _video.onloadeddata = function () {
     const h = 1920
 
