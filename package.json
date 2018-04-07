@@ -1,8 +1,11 @@
 {
   "name": "asap-web",
   "version": "0.0.0",
-  "description": "TODO",
-  "main": "asap-web.js",
+  "description": "An updated Atari music player for the web based",
+  "main": "dist/wrapper.min.js",
+  "files": [
+    "dist/wrapper.min.js"
+  ],
   "scripts": {
     "build": "npm run wrap && npm run wrap:min",
     "build:app": "npm run build:app:js && npm run build:app:js:min && npm run build:app:css",
@@ -20,11 +23,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "asap-web"
+    "asap-web",
+    "atari",
+    "SAP",
+    "asap",
+    "music"
   ],
   "author": "talmobi <talmo.christian@gmail.com>",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "MIT",
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/talmobi/asap-web"
