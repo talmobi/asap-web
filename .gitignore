@@ -10,12 +10,11 @@ node_modules
 *.DS_Store
 
 # sample music files
-# music # add to gh-pages branch
+music # force added to gh-pages branch
 
 # livereload
 miru-connect.js
 
 # build files
-# dist/ # add to gh-pages branch
-#
+dist/ # dist/bundle.min.js force added to gh-pages branch
 stage/
