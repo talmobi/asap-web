@@ -19,17 +19,27 @@ function createAsapPlayer ( opts ) {
     * ref: https://raw.githubusercontent.com/epi/asap/master/asap.h
     */
   player.load = function ( filename, module, song ) {
+    if ( !module ) {
+      console.log( 'Error: no data loaded' )
+
+      const ae = player.audioElement
+
+      if ( ae ) {
+        ae.pause()
+        ae.seek( 0 )
+        ae.onended && ae.onended()
+      }
+
+      return player.stop()
+    }
+
     var asap = new ASAP();
     player.asap = asap;
 
     try {
       asap.load(filename, module, module.length);
     } catch ( err ) {
-      if ( console.error ) {
-        console.error( err )
-      } else {
-        console.log( err )
-      }
+      console.log( err )
 
       const ae = player.audioElement
 
@@ -373,16 +383,21 @@ function binaryHttpRequest(url, onload)
     req.overrideMimeType("text/plain; charset=x-user-defined");
   else
     req.setRequestHeader("Accept-Charset", "x-user-defined");
-  req.onreadystatechange = function() {
-    if (req.readyState == 4 && (req.status == 200 || req.status == 0)) {
+  req.onload = function() {
+    if (req.status >= 200 && req.status < 400) {
       var result;
       var response = req.responseText;
       result = new Array(response.length);
       for (var i = 0; i < response.length; i++) {
         result[i] = response.charCodeAt(i) & 0xff;
       }
-      onload(url, result);
+      return onload(url, result);
     }
+
+    onload(null);
   };
+  req.onerror = function () {
+    onload(null);
+  }
   req.send(null);
 }
