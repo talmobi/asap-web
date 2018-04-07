@@ -7,7 +7,7 @@
     "build": "npm run wrap && npm run wrap:min",
     "build:app": "npm run build:app:js && npm run build:app:js:min && npm run build:app:css",
     "build:app:js": "browserify --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js 2>&1 | wooster",
-    "build:app:js:min": "uglifyjs dist/bundle.js -cmo dist/bundle.min.js",
+    "build:app:js:min": "uglifyjs dist/demo-bundle.js -cmo dist/demo-bundle.min.js",
     "watch:app:js": "watchify -d --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js",
     "build:app:css": "stylus -u nib demo/app.styl -o dist/demo-bundle.css 2>&1 | wooster",
     "watch:app:css": "stylus -w -u nib demo/app.styl -o dist/demo-bundle.css",
