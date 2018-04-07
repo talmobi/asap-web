@@ -1,0 +1,144 @@
+@import 'nib'
+@import 'nib/normalize'
+
+*, *:before, *:after
+  box-sizing: inherit
+
+*
+  box-sizing: border-box
+
+html, body
+  font-family: 'Inconsolata', monospace
+
+  margin: 0
+  padding: 0
+
+  color: pink
+  background: #222
+
+  font-size: 0.925rem
+  font-smoothing: antialiased
+
+  overflow: hidden
+
+#root
+  display: flex
+  flex-flow: row nowrap
+  justify-content: center
+  align-items: center
+  text-align: center
+
+video
+  pointer-events: none
+
+.app
+  width: 400px
+
+.app-title
+  width: 400px
+  line-height: 1.6rem
+  letter-spacing: 1px
+
+.search-container
+  position: relative
+
+.search-input
+  color: pink
+  background: none
+
+  border: none
+  border-bottom: 1px solid pink
+  width: 100%
+
+  line-height: 1.6rem
+  letter-spacing: 2px
+
+  font-size: 1.125rem
+  padding-left: 10%
+
+  &:focus
+    outline: none
+
+.search-list
+  margin: 0
+  padding: 0
+
+  margin-top: 0.5rem
+
+.search-item
+  position: relative
+
+  margin: 0
+  padding: 0
+
+  line-height: 1.6rem
+  letter-spacing: 2px
+
+  &:hover
+    cursor: pointer
+    background: darken( cyan, 20% )
+    color: #222
+
+.search-item__bread
+  position: absolute
+  right: 0
+  top: 0
+  color: maroon
+  opacity: 0
+
+.search-item--first
+  .search-item__bread
+    opacity: 1
+
+.search-item--active
+    background: cyan
+    color: #444
+
+.more-music-button
+  position: relative
+
+  padding: 0
+  margin: 0
+
+  color: #444
+  background: pink
+
+  border: none
+  outline: none
+
+  font-size: 1.075rem
+  letter-spacing: 1px
+  margin-top: 40px
+
+  width: 200px
+  height: 40px
+
+  opacity: 1
+  transform: translate(0,0)
+  transition: transform 0.4s ease-in, opacity 0.4s ease-in
+
+// loading spinner
+.more-music-button__spinner
+  position: absolute
+
+  left: 0
+  top: 0
+
+  margin: 0
+  padding: 0
+
+  height: 50px
+  top: -5px
+
+  left: 50%
+  transform: translate(-50%)
+
+.more-music-button--active
+  opacity: 0
+  transform: translate(0,999px)
+
+.more-music-button__spinner
+  opacity: 0
+
+.more-music-button--loading .more-music-button__spinner
+  opacity: 1
