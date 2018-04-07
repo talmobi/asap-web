@@ -1,6 +1,6 @@
 {
   "name": "asap-web",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An updated Atari music player for the web based",
   "main": "dist/wrapper.min.js",
   "files": [
@@ -40,8 +40,7 @@
     "url": "https://github.com/talmobi/asap-web/issues",
     "email": "talmo.christian@gmail.com"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "redom": "~3.11.1",
     "ya": "~0.2.2",
