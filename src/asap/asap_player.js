@@ -22,7 +22,7 @@ function createAsapPlayer ( opts ) {
     if ( !module ) {
       console.log( 'Error: no data loaded' )
 
-      const ae = player.audioElement
+      var ae = player.audioElement
 
       if ( ae ) {
         ae.pause()
@@ -41,7 +41,7 @@ function createAsapPlayer ( opts ) {
     } catch ( err ) {
       console.log( err )
 
-      const ae = player.audioElement
+      var ae = player.audioElement
 
       if ( ae ) {
         ae.pause()
