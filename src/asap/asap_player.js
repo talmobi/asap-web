@@ -21,7 +21,27 @@ function createAsapPlayer ( opts ) {
   player.load = function ( filename, module, song ) {
     var asap = new ASAP();
     player.asap = asap;
-    asap.load(filename, module, module.length);
+
+    try {
+      asap.load(filename, module, module.length);
+    } catch ( err ) {
+      if ( console.error ) {
+        console.error( err )
+      } else {
+        console.log( err )
+      }
+
+      const ae = player.audioElement
+
+      if ( ae ) {
+        ae.pause()
+        ae.seek( 0 )
+        ae.onended && ae.onended()
+      }
+
+      return player.stop()
+    }
+
     var info = asap.getInfo();
     player.info = info;
 
