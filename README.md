@@ -38,6 +38,9 @@ Works as a UMD module. Exposes window.asap with window.asap.createAsapPlayer() f
 The dist build comes at around 200kb. The average size of a SAP song is around 5kb.
 http://asap.sourceforge.net/sap-format.html
 
+## API
+TODO
+
 ## For who?
 
 ## How
