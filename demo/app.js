@@ -285,14 +285,18 @@ function playTrack ( url )
 
   audioElement.onended = function () {
     console.log( 'song ended' )
-    const aurl = store.state.activeUrl
-    try {
-      const matches = store.state.matches
-      const index = matches.indexOf( aurl )
-      playTrack( matches[ ( index + 1 ) % matches.length ] )
-    } catch ( err ) {
-      console.log( err )
-    }
+
+    // play next song lined up
+    setTimeout( function () {
+      const aurl = store.state.activeUrl
+      try {
+        const matches = store.state.matches
+        const index = matches.indexOf( aurl )
+        playTrack( matches[ ( index + 1 ) % matches.length ] )
+      } catch ( err ) {
+        console.log( err )
+      }
+    }, 200 )
   }
 }
 
