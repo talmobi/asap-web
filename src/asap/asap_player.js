@@ -143,6 +143,7 @@ function createAsapPlayer ( opts ) {
   }
 
   player.startTicking = function () {
+    player._timerIds += 1
     var timerId = player._timerIds
     // console.log( 'start ticking: ' + timerId )
 
