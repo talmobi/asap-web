@@ -30,20 +30,23 @@ function App ()
   let _more
   let _moreText
   let _video
+  let _progress
 
   const _el = el( 'div.app',
+    _progress = el( 'span.progress' ),
     _video = el( 'video#bg-video', {
       loop: true,
       muted: true,
       autoplay: false,
       src: 'https://i.imgur.com/IvPmyye.mp4',
       style: {
-        position: 'absolute',
+        position: 'fixed',
         opacity: 0,
         maxHeight: 0,
       }
     } ),
-    el( 'h1.app-title', 'asap-web' ),
+    el( 'a.app-title', 'asap-web', { href: 'https://github.com/talmobi/asap-web' } ),
+    el( 'a.app-desc', 'easily play atari music files on the web' ),
     el( 'div.search-container',
       _search = SearchInput(),
       _list = list( 'ul.search-list', SearchItem )
@@ -54,14 +57,21 @@ function App ()
     )
   )
 
+  store.on( 'timestamp', function ( timestamp ) {
+    _progress.innerText =  timestamp
+  } )
+
   _video.onloadeddata = function () {
     const h = 1920
 
     const vw = _video.videoWidth
     const vh = _video.videoHeight
 
+    const k = h / vh
+    const woffset = Math.floor( vw * k )
+
     _video.style.top = 0
-    _video.style.left = -(_video.videoWidth / 2 ) + 'px'
+    _video.style.left = -( woffset / 4 ) + 'px'
     _video.style.height = h + 'px'
 
     _video.style.opacity = 0.15
@@ -69,6 +79,8 @@ function App ()
   }
 
   _more.onclick = function () {
+    if ( _moreText.textContent === '' ) return
+
     _moreText.textContent = ''
     _more.classList.add( 'more-music-button--loading' )
 
@@ -76,13 +88,25 @@ function App ()
       if ( !err && songs ) {
         _more.classList.add( 'more-music-button--active' )
 
-        songs.forEach( function ( song, ind, arr ) {
-          store.state.songs.push( song )
+        setTimeout( function () {
+          const chunks = []
 
-          if ( ind === Math.floor( arr.length / 10 ) ) {
-            store.emit( 'songs' )
+          for ( let i = 0; i < 11; i++ ) {
+            const len = Math.ceil( songs.length / 10 )
+            chunks.push( songs.splice( 0, len ) )
           }
-        } )
+          chunks.push( [] )
+
+          chunks.forEach( function ( songs, ind ) {
+            setTimeout( function () {
+              songs.forEach( function ( song ) {
+                store.state.songs.push( song )
+              } )
+
+              store.emit( 'songs' )
+            }, 500 * ind )
+          } )
+        }, 300 )
       } else {
         _more.classList.remove( 'more-music-button--loading' )
         _moreText.textContent = err
@@ -244,6 +268,7 @@ function playTrack ( url )
 
     if ( timestamp !== _lastTimestamp ) {
       console.log( timestamp )
+      store.emit( 'timestamp', timestamp  + 's' )
     }
 
     _lastTimestamp = timestamp
@@ -307,7 +332,9 @@ function getMoreMusic ( callback )
     callback( 'connection error' )
   }
 
-  xhr.send()
+  setTimeout( function () {
+    xhr.send()
+  }, 300 )
 }
 
 function pauseBgVideo ()
