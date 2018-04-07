@@ -79,11 +79,10 @@ body {
   line-height: 1.6rem;
   letter-spacing: 3px;
 }
-video {
-  position: fixed;
+#bg-video {
+  position: fixed !important;
   pointer-events: none;
-  top: 0;
-  z-index: -20;
+  top: 0px;
 }
 .app {
   width: 400px;
