@@ -13,7 +13,7 @@ https://talmobi.github.io/asap-web/
 
 ## Easy to use
 
-#### Module usage
+#### CommonJS
 ```javascript
 const asap = require( 'asap-web' )
 const player = asap.createAsapPlayer()
@@ -23,6 +23,21 @@ const track = player.Track( url )
 
 const audioElement = track.open()
 audioElement.play()
+```
+
+#### UMD (Browser)
+```javascript
+<script src="dist/wrapper.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+  const asap = window.asap
+  const player = asap.createAsapPlayer()
+
+  const url = 'https://s3-eu-west-1.amazonaws.com/s3.jin.bucket/gsl_chip_archive/Grayscale/DrillDance.sap'
+  const track = player.Track( url )
+
+  const audioElement = track.open()
+  audioElement.play()
+</script>
 ```
 
 ## About
