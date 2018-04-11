@@ -135,6 +135,7 @@ function App ()
   } )
 
   _list.update( store.state.songs )
+
   store.on( 'songs', function () {
     _list.update( store.state.songs )
     store.emit( 'search' )
@@ -178,6 +179,7 @@ function SearchInput ()
   }
 }
 
+let _deactivateLastSearchItem
 function SearchItem ( url )
 {
   let _text
@@ -199,6 +201,11 @@ function SearchItem ( url )
         _currentAudioElement.pause()
       }
     } else {
+
+      _deactivateLastSearchItem && _deactivateLastSearchItem()
+      _deactivateLastSearchItem = deactivate
+      activate()
+
       playTrack( _url )
     }
   }
@@ -212,31 +219,25 @@ function SearchItem ( url )
 
     _url = url
 
-    var aurl = store.state.activeUrl
-    if ( _url === aurl ) {
-      _el.classList.add( 'search-item--active' )
-    } else {
-      _el.classList.remove( 'search-item--active' )
-    }
-
     let text = url
 
     text = text.split( '/' ).slice( -2 ).join( '/' )
     _text.textContent = text
   }
 
-  store.on( 'active-url', function () {
-    var aurl = store.state.activeUrl
-    if ( _url === aurl ) {
-      _el.classList.add( 'search-item--active' )
-    } else {
-      _el.classList.remove( 'search-item--active' )
-    }
-  } )
+  function activate () {
+    _el.classList.add( 'search-item--active' )
+  }
+
+  function deactivate () {
+    _el.classList.remove( 'search-item--active' )
+  }
 
   return {
     el: _el,
-    update
+    update,
+    activate,
+    deactivate
   }
 }
 
