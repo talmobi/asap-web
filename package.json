@@ -12,7 +12,7 @@
     "build:demo:js": "browserify --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js 2>&1 | wooster",
     "buble:demo:js": "browserify --bare -t [ bubleify ] demo/app.js -o dist/demo-bundle.js 2>&1 | wooster",
     "build:demo:js:min": "uglifyjs dist/demo-bundle.js -cmo dist/demo-bundle.js",
-    "watch:demo:js": "watchify -d --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js",
+    "watch:demo:js": "watchify -v -d --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js",
     "build:demo:css": "stylus -u nib demo/app.styl -o dist/demo-bundle.css 2>&1 | wooster",
     "watch:demo:css": "stylus -w -u nib demo/app.styl -o dist/demo-bundle.css",
     "watch:demo": "miru -t dist/wrapper.js -t index.html -w [npm run watch:demo:js, dist/demo-bundle.js] -w [npm run watch:demo:css, dist/demo-bundle.css]",
