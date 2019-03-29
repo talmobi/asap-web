@@ -10,6 +10,7 @@
     "build": "npm run wrap && npm run wrap:min",
     "build:demo": "npm run build:demo:js && npm run build:demo:js:min && npm run build:demo:css",
     "build:demo:js": "browserify --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js 2>&1 | wooster",
+    "buble:demo:js": "browserify --bare -t [ bubleify ] demo/app.js -o dist/demo-bundle.js 2>&1 | wooster",
     "build:demo:js:min": "uglifyjs dist/demo-bundle.js -cmo dist/demo-bundle.js",
     "watch:demo:js": "watchify -d --bare -t [ babelify --presets [ env ] ] demo/app.js -o dist/demo-bundle.js",
     "build:demo:css": "stylus -u nib demo/app.styl -o dist/demo-bundle.css 2>&1 | wooster",
